@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.angularjs.org/1.2.10/angular.min.js"></script>
+    <script src="https://angular-ui.github.io/ui-router/release/angular-ui-router.min.js"></script>
+</head>
+<body ng-app ="myApp" ng-controller="myController">
+<div>
+    <button ng-click="callBackend()">Click</button>
+
+    <div>
+        Response Data: {{data}} <br />
+        Error: {{error}}
+    </div>
+</div>
+<script>
+    var myApp = angular.module('myApp', []);
+
+    myApp.controller("myController", function ($scope, $http) {
+
+        var onSuccess = function (data, status, headers, config) {
+            $scope.data = data;
+        };
+
+        var onError = function (data, status, headers, config) {
+            $scope.error = status;
+        }
+
+
+        $scope.callBackend = function () {
+            var promise = $http.get("http://dmqlprojectspringboot-env.eba-g7dpmtmp.us-east-2.elasticbeanstalk.com/data/allUsers").success(onSuccess).error(onError);
+        }
+
+    });
+</script>
+</body>
+</html>
