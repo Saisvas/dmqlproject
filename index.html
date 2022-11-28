@@ -3,14 +3,105 @@
 <head>
     <script src="https://code.angularjs.org/1.2.10/angular.min.js"></script>
     <script src="https://angular-ui.github.io/ui-router/release/angular-ui-router.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </head>
 <body ng-app ="myApp" ng-controller="myController">
 <div>
-    <button ng-click="callBackend()">Click</button>
+    <button type="button" class="btn btn-info" ng-click="getUsers()">Users</button>
+    <button type="button" class="btn btn-info" ng-click="getUsage()">Usage</button>
+    <button type="button" class="btn btn-info" ng-click="getCoverage()">Coverage</button>
+    <button type="button" class="btn btn-info" ng-click="getPlans()">Plans</button>
+    <button type="button" class="btn btn-info" ng-click="getProviders()">ServiceProviders</button>
+    <button type="button" class="btn btn-info" ng-click="clearScr()">Clear Screen</button>
 
     <div>
-        Response Data: {{data}} <br />
-        Error: {{error}}
+        <table ng-if="tableView==1">
+            <tr>
+                <th>Id</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Gender</th>
+                <th>Street</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Zip</th>
+                <th>SSN</th>
+            </tr>
+            <tr ng-repeat ="each in data">
+                <td>{{each.id}}</td>
+                <td>{{each.providername}}</td>
+                <td>{{each.established}}</td>
+                <td>{{each.headQuarters}}</td>
+            </tr>
+        </table>
+        <table ng-if="tableView==2">
+            <tr>
+                <th>Id</th>
+                <th>ProviderName</th>
+                <th>Established</th>
+                <th>HeadQuarters</th>
+            </tr>
+            <tr ng-repeat ="each in data">
+                <td>{{each.id}}</td>
+                <td>{{each.providername}}</td>
+                <td>{{each.established}}</td>
+                <td>{{each.headQuarters}}</td>
+            </tr>
+        </table>
+        <table ng-if="tableView==4">
+            <tr>
+                <th>Id</th>
+                <th>ProviderName</th>
+                <th>Established</th>
+                <th>HeadQuarters</th>
+            </tr>
+            <tr ng-repeat ="each in data">
+                <td>{{each.id}}</td>
+                <td>{{each.providername}}</td>
+                <td>{{each.established}}</td>
+                <td>{{each.headQuarters}}</td>
+            </tr>
+        </table>
+        <table ng-if="tableView==3">
+            <tr>
+                <th>Id</th>
+                <th>Cost</th>
+                <th>Currency</th>
+                <th>ServiceProviderId</th>
+                <th>TalkTimeInMins</th>
+                <th>DataInGB</th>
+                <th>ValidityInMonths</th>
+                <th>NetworkType</th>
+            </tr>
+            <tr ng-repeat ="each in data">
+                <td>{{each.id}}</td>
+                <td><input value="{{each.cost}}" ng-init="originalCost=each.cost" ng-model="each.cost" ng-change="planChange(each,originalCost,1)"></td>
+                <td>{{each.currency}}</td>
+                <td>{{each.serviceproviderid}}</td>
+                <td>{{each.talktimeinmins}}</td>
+                <td>{{each.dataingb}}</td>
+                <td>{{each.validityinmonths}}</td>
+                <td>{{each.networktype}}</td>
+                <td><button type="button" class="btn btn-success" ng-if="each.changed==true" ng-click="updatePlan(each)">Update</button></td>
+            </tr>
+        </table>
+        <table ng-if="tableView==5">
+            <tr>
+                <th>Id</th>
+                <th>ProviderName</th>
+                <th>Established</th>
+                <th>HeadQuarters</th>
+            </tr>
+            <tr ng-repeat ="each in data">
+                <td>{{each.id}}</td>
+                <td>{{each.providername}}</td>
+                <td>{{each.established}}</td>
+                <td>{{each.headQuarters}}</td>
+            </tr>
+        </table>
     </div>
 </div>
 <script>
@@ -26,9 +117,52 @@
             $scope.error = status;
         }
 
+        $scope.tableView = 0;
+        // $scope.planChanged = 0;
+        $scope.getUsers = function () {
+            $http.get("http://localhost:8181/data/allUsers").success(onSuccess).error(onError);
+            $scope.tableView = 1;
+        }
 
-        $scope.callBackend = function () {
-            var promise = $http.get("http://dmqlprojectspringboot-env.eba-g7dpmtmp.us-east-2.elasticbeanstalk.com/data/allUsers").success(onSuccess).error(onError);
+        $scope.getUsage = function () {
+            $http.get("http://localhost:8181/data/allUsage").success(onSuccess).error(onError);
+            $scope.tableView = 2;
+        }
+
+        $scope.getPlans = function () {
+            $http.get("http://localhost:8181/data/allPlans").success(onSuccess).error(onError);
+            $scope.tableView = 3;
+            $scope.planChanged = 0;
+        }
+        $scope.planChange = function (data,originalValue,index){
+            // $scope.planChanged = 1;
+
+            if(index == 1 ){
+                if(originalValue!=data.cost)
+                data.changed = true;
+                else data.changed = false;
+            }
+
+        }
+
+        $scope.updatePlan = function (data){
+            $http.post("http://localhost:8181/data/createOrUpdatePlan",data).success(onSuccess).error(onError);
+            $scope.getPlans();
+        }
+
+        $scope.getCoverage = function () {
+            $http.get("http://localhost:8181/data/allCoverage").success(onSuccess).error(onError);
+            $scope.tableView = 4;
+        }
+        $scope.getProviders = function () {
+            $scope.tableView = 5;
+            $http.get("http://localhost:8181/data/allServiceProviders").success(onSuccess).error(onError);
+
+        }
+
+        $scope.clearScr = function (){
+            $scope.data = null;
+            $scope.tableView = 0;
         }
 
     });
