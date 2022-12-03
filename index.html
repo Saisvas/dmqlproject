@@ -1,171 +1,697 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <script src="https://code.angularjs.org/1.2.10/angular.min.js"></script>
-    <script src="https://angular-ui.github.io/ui-router/release/angular-ui-router.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
+
 </head>
 <body ng-app ="myApp" ng-controller="myController">
-<div>
-    <button type="button" class="btn btn-info" ng-click="getUsers()">Users</button>
-    <button type="button" class="btn btn-info" ng-click="getUsage()">Usage</button>
-    <button type="button" class="btn btn-info" ng-click="getCoverage()">Coverage</button>
-    <button type="button" class="btn btn-info" ng-click="getPlans()">Plans</button>
-    <button type="button" class="btn btn-info" ng-click="getProviders()">ServiceProviders</button>
-    <button type="button" class="btn btn-info" ng-click="clearScr()">Clear Screen</button>
-
-    <div>
-        <table ng-if="tableView==1">
-            <tr>
-                <th>Id</th>
-                <th>FirstName</th>
-                <th>LastName</th>
-                <th>Gender</th>
-                <th>Street</th>
-                <th>City</th>
-                <th>State</th>
-                <th>Zip</th>
-                <th>SSN</th>
-            </tr>
-            <tr ng-repeat ="each in data">
-                <td>{{each.id}}</td>
-                <td>{{each.providername}}</td>
-                <td>{{each.established}}</td>
-                <td>{{each.headQuarters}}</td>
-            </tr>
-        </table>
-        <table ng-if="tableView==2">
-            <tr>
-                <th>Id</th>
-                <th>ProviderName</th>
-                <th>Established</th>
-                <th>HeadQuarters</th>
-            </tr>
-            <tr ng-repeat ="each in data">
-                <td>{{each.id}}</td>
-                <td>{{each.providername}}</td>
-                <td>{{each.established}}</td>
-                <td>{{each.headQuarters}}</td>
-            </tr>
-        </table>
-        <table ng-if="tableView==4">
-            <tr>
-                <th>Id</th>
-                <th>ProviderName</th>
-                <th>Established</th>
-                <th>HeadQuarters</th>
-            </tr>
-            <tr ng-repeat ="each in data">
-                <td>{{each.id}}</td>
-                <td>{{each.providername}}</td>
-                <td>{{each.established}}</td>
-                <td>{{each.headQuarters}}</td>
-            </tr>
-        </table>
-        <table ng-if="tableView==3">
-            <tr>
-                <th>Id</th>
-                <th>Cost</th>
-                <th>Currency</th>
-                <th>ServiceProviderId</th>
-                <th>TalkTimeInMins</th>
-                <th>DataInGB</th>
-                <th>ValidityInMonths</th>
-                <th>NetworkType</th>
-            </tr>
-            <tr ng-repeat ="each in data">
-                <td>{{each.id}}</td>
-                <td><input value="{{each.cost}}" ng-init="originalCost=each.cost" ng-model="each.cost" ng-change="planChange(each,originalCost,1)"></td>
-                <td>{{each.currency}}</td>
-                <td>{{each.serviceproviderid}}</td>
-                <td>{{each.talktimeinmins}}</td>
-                <td>{{each.dataingb}}</td>
-                <td>{{each.validityinmonths}}</td>
-                <td>{{each.networktype}}</td>
-                <td><button type="button" class="btn btn-success" ng-if="each.changed==true" ng-click="updatePlan(each)">Update</button></td>
-            </tr>
-        </table>
-        <table ng-if="tableView==5">
-            <tr>
-                <th>Id</th>
-                <th>ProviderName</th>
-                <th>Established</th>
-                <th>HeadQuarters</th>
-            </tr>
-            <tr ng-repeat ="each in data">
-                <td>{{each.id}}</td>
-                <td>{{each.providername}}</td>
-                <td>{{each.established}}</td>
-                <td>{{each.headQuarters}}</td>
-            </tr>
-        </table>
+<div class="container">
+    <div id="page-loading" ng-if="loading">
+        <center><img style="margin:0 auto;"  src="/spinner.gif" /></center>
     </div>
+
+    <h6 ng-if="!loading" style="top: 0px; right: 0px; position: absolute; color: #BD362F ; border: 2px solid #BD362F; " >You're currently viewing as Admin</h6>
+
+    <center><div ng-if="!loading" class="container"><h1>Mobile Internet Usage Analysis</h1></div></center>
+
+    <div ng-if="!loading" id="exTab3" class="container">
+        <ul  class="nav nav-pills">
+            <li class="active">
+                <a  href="#1b" data-toggle="tab">Service Providers</a>
+            </li>
+            <li><a href="#2b" data-toggle="tab">Users</a>
+            </li>
+            <li><a href="#3b" data-toggle="tab">Coverage</a>
+            </li>
+            <li><a href="#4a" data-toggle="tab">Plans</a>
+            </li>
+            <li><a href="#5a" data-toggle="tab">Usage</a>
+            </li>
+        </ul>
+
+        <center><div><hr size="10px" width="100%" color="orange"></div></center>
+
+        <div class="tab-content clearfix">
+            <div class="tab-pane active" id="1b">
+                <table class="table table-hover table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>ProviderName</th>
+                        <th>Established</th>
+                        <th>HeadQuarters</th>
+                    </tr>
+                    <tr>
+
+                    </tr><br>
+
+                    <tr>
+                        <div class="row">
+                            <div class="col-sm-4 col-lg-4">
+                                <button style="float: left" ng-disabled="providerPage==1" type="button"
+                                        class="btn btn-info" ng-click="callPage(providerPage-1,1)"><i
+                                        class="bi bi-arrow-left-circle-fill"></i>&nbsp Prev
+                                </button>
+                            </div>
+                            <div class="col-sm-4 col-lg-4">
+                                <center>
+                                    <button type="button" class="btn btn-warning" ng-click="switchToEditMode(1)">Edit
+                                    </button>
+                                    <button type="button" class="btn btn-warning" ng-click="insertData(1)">Insert
+                                    </button>
+                                </center>
+                            </div>
+                            <div class="col-sm-4 col-lg-4">
+                                <button style="float: right; position:relative;" type="button" class="btn btn-info"
+                                        ng-click="callPage(providerPage+1,1)">Next&nbsp<i
+                                        class="bi bi-arrow-right-circle-fill"></i></button>
+                            </div>
+                        </div>
+                    </tr>
+                    <br><br>
+
+                    <tr ng-repeat ="each in providers">
+                        <td>{{each.id}}</td>
+                            <td><input ng-disabled="!providerEdit" class="form-control" value="{{each.providername}}" ng-init="spid=each.providername" ng-model="each.providername" ng-change="planChange(each.providername,spid,each)"></td>
+                        <td><input ng-disabled="!providerEdit" class="form-control" value="{{each.established}}" ng-init="est=each.established" ng-model="each.established" ng-change="planChange(each.established,est,each)"></td>
+                        <td><input ng-disabled="!providerEdit" class="form-control" value="{{each.headQuarters}}" ng-init="hq=each.headQuarters" ng-model="each.headQuarters" ng-change="planChange(each.headQuarters,hq,each)"></td>
+                        <td><button type="button" class="btn btn-success" ng-if="each.changed==true && providerInsert==false" ng-click="updateProvider(each)">Update</button></td>
+                        <td><button type="button" class="btn btn-success" ng-if="providerInsert==true" ng-click="insertLogic(each,1)">Insert</button></td>
+                        <td><button type="button" class="btn btn-danger" ng-if="providerInsert==true" ng-click="cancelInsert(1)">Cancel</button></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="tab-pane" id="2b">
+                <table class="table table-hover table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>FirstName</th>
+                        <th>LastName</th>
+                        <th>Gender</th>
+                        <th>Street</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Zip</th>
+                        <th>SSN</th>
+                    </tr>
+                    <tr>
+                        <div class="row">
+                            <div class="col-sm-4 col-lg-4">
+                                <button style="float: left" ng-disabled="userPage==1" type="button"
+                                        class="btn btn-info" ng-click="callPage(userPage-1,2)"><i
+                                        class="bi bi-arrow-left-circle-fill"></i>&nbsp Prev
+                                </button>
+                            </div>
+                            <div class="col-sm-4 col-lg-4">
+                                <center>
+                                    <button type="button" class="btn btn-warning" ng-click="switchToEditMode(2)">Edit
+                                    </button>
+                                    <button type="button" class="btn btn-warning" ng-click="insertData(2)">Insert
+                                    </button>
+                                </center>
+                            </div>
+                            <div class="col-sm-4 col-lg-4">
+                                <button style="float: right; position:relative;" type="button" class="btn btn-info"
+                                        ng-click="callPage(userPage+1,2)">Next&nbsp<i
+                                        class="bi bi-arrow-right-circle-fill"></i></button>
+                            </div>
+                        </div>
+                    </tr>
+                    <br><br>
+                    <tr ng-repeat ="each in users">
+                        <td>{{each.id}}</td>
+                        <td><input ng-disabled="!userEdit" class="form-control" value="{{each.firstName}}" ng-init="fname=each.firstName" ng-model="each.firstName" ng-change="planChange(each.firstName,fname,each)"></td>
+                        <td><input ng-disabled="!userEdit" class="form-control" value="{{each.lastName}}" ng-init="lname=each.lastName" ng-model="each.lastName" ng-change="planChange(each.lastName,lname,each)"></td>
+
+                        <td><input ng-disabled="!userEdit" class="form-control" value="{{each.gender}}" ng-init="gender=each.gender" ng-model="each.gender" ng-change="planChange(each.gender,gender,each)"></td>
+
+                        <td><input ng-disabled="!userEdit" class="form-control" value="{{each.street}}" ng-init="strt=each.street" ng-model="each.street" ng-change="planChange(each.street,strt,each)"></td>
+
+                        <td><input ng-disabled="!userEdit" class="form-control" value="{{each.city}}" ng-init="city=each.city" ng-model="each.city" ng-change="planChange(each.city,city,each)"></td>
+
+                        <td><input ng-disabled="!userEdit" class="form-control" value="{{each.state}}" ng-init="spid=each.state" ng-model="each.state" ng-change="planChange(each.state,state,each)"></td>
+
+                        <td><input ng-disabled="!userEdit" class="form-control" value="{{each.zip}}" ng-init="spid=each.zip" ng-model="each.zip" ng-change="planChange(each.zip,zip,each)"></td>
+
+                        <td><input ng-disabled="!userEdit" class="form-control" value="{{each.ssn}}" ng-init="spid=each.ssn" ng-model="each.ssn" ng-change="planChange(each.ssn,ssn,each)"></td>
+                        <td><button type="button" class="btn btn-info" ng-if="each.changed==true && userInsert==false" ng-click="updateUser(each)">Update</button></td>
+                        <td><button type="button" class="btn btn-info" ng-if="userInsert==true" ng-click="insertLogic(each,2)">Insert</button></td>
+                        <td><button type="button" class="btn btn-info" ng-if="userInsert==true" ng-click="cancelInsert(2)">Cancel</button></td>
+
+                    </tr>
+                </table>
+
+            </div>
+            <div class="tab-pane" id="3b">
+                <table class="table table-hover table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>ServiceProviderId</th>
+                        <th>SignalStrength</th>
+                        <th>ZipCode</th>
+                        <th>NetworkType</th>
+                    </tr>
+                    <tr>
+                    <div class="row">
+                        <div class="col-sm-4 col-lg-4">
+                            <button style="float: left" ng-disabled="coveragePage==1" type="button"
+                                    class="btn btn-info" ng-click="callPage(coveragePage-1,3)"><i
+                                    class="bi bi-arrow-left-circle-fill"></i>&nbsp Prev
+                            </button>
+                        </div>
+                        <div class="col-sm-4 col-lg-4">
+                            <center>
+                                <button type="button" class="btn btn-warning" ng-click="switchToEditMode(3)">Edit
+                                </button>
+                                <button type="button" class="btn btn-warning" ng-click="insertData(3)">Insert
+                                </button>
+                            </center>
+                        </div>
+                        <div class="col-sm-4 col-lg-4">
+                            <button style="float: right; position:relative;" type="button" class="btn btn-info"
+                                    ng-click="callPage(coveragePage+1,3)">Next&nbsp<i
+                                    class="bi bi-arrow-right-circle-fill"></i></button>
+                        </div>
+                    </div></tr>
+                    <br><br>
+                    <tr ng-repeat ="each in coverage">
+                        <td>{{each.id}}</td>
+                        <td><input ng-disabled="!coverageEdit" class="form-control" value="each.serviceproviderid" ng-init="spid=each.serviceproviderid" ng-model="each.serviceproviderid" ng-change="planChange(each.serviceproviderid,spid,each)"></td>
+                        <td>
+                            <select ng-disabled="!coverageEdit" class="form-select" value="each.signalStrength" ng-init="signalStrength=each.signalStrength" ng-model="each.signalStrength" ng-change="planChange(each.signalStrength,signalStrength,each)">
+                                <option value="Strong">Strong</option>
+                                <option value="Moderate">Moderate</option>
+                                <option value="Poor">Poor</option>
+                            </select>
+                        <td><input ng-disabled="!coverageEdit" class="form-control" value="each.zipcode" ng-init="zcode=each.zipcode" ng-model="each.zipcode" ng-change="planChange(each.zipcode,zcode,each)"></td>
+
+                        <td><select ng-disabled="!coverageEdit" class="form-select" value="each.networktype" ng-init="originalntp=each.networktype" ng-model="each.networktype" ng-change="planChange(each.networktype,originalntp,each)">
+                            <option value="3G">3G</option>
+                            <option value="4G">4G</option>
+                            <option value="5G">5G</option>
+                        </select></td>
+                        <td><button type="button" class="btn btn-info" ng-if="each.changed==true && covInsert==false" ng-click="updateCov(each)">Update</button></td>
+                        <td><button type="button" class="btn btn-info" ng-if="covInsert==true" ng-click="insertLogic(each,3)">Insert</button></td>
+                        <td><button type="button" class="btn btn-info" ng-if="covInsert==true" ng-click="cancelInsert(3)">Cancel</button></td>
+
+                    </tr>
+                </table>
+            </div>
+            <div class="tab-pane" id="4a">
+                <table class="table table-hover table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>Cost</th>
+                        <th>Currency</th>
+                        <th>ServiceProviderId</th>
+                        <th>TalkTime(in mins)</th>
+                        <th>Data(in GB)</th>
+                        <th>Validity in Months</th>
+                        <th>Network Type</th>
+                    </tr>
+                    <tr>
+                        <div class="row">
+                            <div class="col-sm-4 col-lg-4">
+                                <button style="float: left" ng-disabled="planPage==1" type="button"
+                                        class="btn btn-info" ng-click="callPage(planPage-1,4)"><i
+                                        class="bi bi-arrow-left-circle-fill"></i>&nbsp Prev
+                                </button>
+                            </div>
+                            <div class="col-sm-4 col-lg-4">
+                                <center>
+                                    <button type="button" class="btn btn-warning" ng-click="switchToEditMode(4)">Edit
+                                    </button>
+                                    <button type="button" class="btn btn-warning" ng-click="insertData(4)">Insert
+                                    </button>
+                                </center>
+                            </div>
+                            <div class="col-sm-4 col-lg-4">
+                                <button style="float: right; position:relative;" type="button" class="btn btn-info"
+                                        ng-click="callPage(planPage+1,4)">Next&nbsp<i
+                                        class="bi bi-arrow-right-circle-fill"></i></button>
+                            </div>
+                        </div>
+                    </tr>
+                    <br><br>
+                    <tr ng-repeat ="each in plans">
+                        <td>{{each.id}}</td>
+                        <td><input ng-disabled="!planEdit" class="form-control" value="{{each.cost}}" ng-init="originalCost=each.cost" ng-model="each.cost" ng-change="planChange(each.cost,originalCost,each)"></td>
+                        <td><input ng-disabled="!planEdit" readonly class="form-control" value="{{each.currency}}" ng-init="originalCurr=each.currency" ng-model="each.currency" ng-change="planChange(each.currency,originalCurr,each)"></td>
+                        <td><input ng-disabled="!planEdit" class="form-control" value="{{each.serviceproviderid}}" ng-init="originalsp=each.serviceproviderid" ng-model="each.serviceproviderid" ng-change="planChange(each.serviceproviderid,originalsp,each)"></td>
+                        <td><input ng-disabled="!planEdit" class="form-control" value="{{each.talktimeinmins}}" ng-init="originaltt=each.talktimeinmins" ng-model="each.talktimeinmins" ng-change="planChange(each.talktimeinmins,originaltt,each)"></td>
+                        <td><input ng-disabled="!planEdit" class="form-control" value="{{each.dataingb}}" ng-init="originaldata=each.dataingb" ng-model="each.dataingb" ng-change="planChange(each.dataingb,originaldata,each)"></td>
+                        <td><input ng-disabled="!planEdit" class="form-control" value="{{each.validityinmonths}}" ng-init="originalvdt=each.validityinmonths" ng-model="each.validityinmonths" ng-change="planChange(each.validityinmonths,originalvdt,each)"></td>
+                        <td><select ng-disabled="!planEdit" class="form-select" value="each.networktype" ng-init="originalntp=each.networktype" ng-model="each.networktype" ng-change="planChange(each.networktype,originalntp,each)">
+                            <option value="3G">3G</option>
+                            <option value="4G">4G</option>
+                            <option value="5G">5G</option>
+                        </select></td>
+                        <td><button type="button" class="btn btn-info" ng-if="each.changed==true && planInsert==false" ng-click="updatePlan(each)">Update</button></td>
+                        <td><button type="button" class="btn btn-info" ng-if="planInsert==true" ng-click="insertLogic(each,4)">Insert</button></td>
+                        <td><button type="button" class="btn btn-info" ng-if="planInsert==true" ng-click="cancelInsert(4)">Cancel</button></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="tab-pane" id="5a">
+                <table class="table table-hover table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>UserId</th>
+                        <th>PlanId</th>
+                        <th>MinutesUsed</th>
+                        <th>DataUsed</th>
+                        <th>ServiceProviderAccountNo</th>
+                    </tr>
+                    <tr>
+                        <div class="row">
+                            <div class="col-sm-4 col-lg-4">
+                                <button style="float: left" ng-disabled="planPage==1" type="button"
+                                        class="btn btn-info" ng-click="callPage(usagePage-1,5)"><i
+                                        class="bi bi-arrow-left-circle-fill"></i>&nbsp Prev
+                                </button>
+                            </div>
+                            <div class="col-sm-4 col-lg-4">
+                                <center>
+                                    <button type="button" class="btn btn-warning" ng-click="switchToEditMode(5)">Edit
+                                    </button>
+                                    <button type="button" class="btn btn-warning" ng-click="insertData(5)">Insert
+                                    </button>
+                                </center>
+                            </div>
+                            <div class="col-sm-4 col-lg-4">
+                                <button style="float: right; position:relative;" type="button" class="btn btn-info"
+                                        ng-click="callPage(usagePage+1,5)">Next&nbsp<i
+                                        class="bi bi-arrow-right-circle-fill"></i></button>
+                            </div>
+                        </div>
+                    </tr>
+                    <br><br>
+
+                    <tr ng-repeat ="each in usages">
+                        <td>{{each.id}}</td>
+                        <td><input ng-disabled="!usageEdit" class="form-control" value="{{each.userId}}" ng-init="userId=each.userId" ng-model="each.userId" ng-change="planChange(each.userId,userId,each)"></td>
+
+                        <td><input ng-disabled="!usageEdit"  class="form-control" value="{{each.planId}}" ng-init="planId=each.planId" ng-model="each.planId" ng-change="planChange(each.planId,planId,each)"></td>
+                        <td><input ng-disabled="!usageEdit"  class="form-control" value="{{each.minutesused}}" ng-init="minutesused=each.minutesused" ng-model="each.minutesused" ng-change="planChange(each.minutesused,minutesused,each)"></td>
+
+                        <td><input ng-disabled="!usageEdit" class="form-control" value="{{each.dataUsed}}" ng-init="dataUsed=each.dataUsed" ng-model="each.dataUsed" ng-change="planChange(each.dataUsed,dataUsed,each)"></td>
+                        <td><input ng-disabled="!usageEdit" class="form-control" value="{{each.serviceprovideraccountnumber}}" ng-init="userId=each.serviceprovideraccountnumber" ng-model="each.serviceprovideraccountnumber" ng-change="planChange(each.serviceprovideraccountnumber,serviceprovideraccountnumber,each)"></td>
+                        <td><button type="button" class="btn btn-info" ng-if="each.changed==true && usageInsert==false" ng-click="updateUsage(each)">Update</button></td>
+                        <td><button type="button" class="btn btn-info" ng-if="usageInsert==true" ng-click="insertLogic(each,5)">Insert</button></td>
+                        <td><button type="button" class="btn btn-info" ng-if="usageInsert==true" ng-click="cancelInsert(5)">Cancel</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 <script>
     var myApp = angular.module('myApp', []);
 
-    myApp.controller("myController", function ($scope, $http) {
+    myApp.controller("myController", function ($scope, $http,$window) {
+
+        $scope.users = [];
+        $scope.plans = [];
+
 
         var onSuccess = function (data, status, headers, config) {
-            $scope.data = data;
+            // $scope.data = data;
+            // $window.alert("Success!");
+            // $scope.loading = true;
+            // await sleep(1 * 1000);
+            // $scope.loading = false;
+            toastr.options.timeOut = 1500; // 1.5s
+            toastr.success("Success");
+        };
+
+        var onUserSuccess = function (data, status, headers, config) {
+            $scope.users = data;
+            // $window.alert("Success!");
+            toastr.options.timeOut = 1500; // 1.5s
+            toastr.success("Success");
+        };
+
+        var onProviderSuccess = function (data, status, headers, config) {
+            console.log("Entered Get provider");
+            console.log(data);
+            $scope.providers = data;
+            console.log($scope.providers);
+            toastr.options.timeOut = 1500; // 1.5s
+            toastr.success("Success");
+            // $window.alert("Success!");
+        };
+
+        var onUsageSuccess = function (data, status, headers, config) {
+            $scope.usages = data;
+            // $window.alert("Success!");
+            toastr.options.timeOut = 1500; // 1.5s
+            toastr.success("Success");
+        };
+
+        var onPlansSuccess = function (data, status, headers, config) {
+            $scope.plans = data;
+            console.log("Plan reload response"+ JSON.stringify(data));
+            console.log("In actual plan reload success" + JSON.stringify($scope.plans));
+            toastr.options.timeOut = 1500; // 1.5s
+            toastr.success("Success");
+            // $window.alert("Success!");
+        };
+
+        var onCoverageSuccess = function (data, status, headers, config) {
+            $scope.coverage = data;
+            // $window.alert("Success!");
         };
 
         var onError = function (data, status, headers, config) {
             $scope.error = status;
+            // $window.alert("Error!"+ data.status +"Message is:"+ data.error);
+            toastr.options.timeOut = 1500; // 1.5s
+            toastr.error(data.status ,data.error);
         }
 
         $scope.tableView = 0;
+
         // $scope.planChanged = 0;
-        $scope.getUsers = function () {
-            $http.get("http://localhost:8181/data/allUsers").success(onSuccess).error(onError);
+        $scope.getUsers = function (page) {
+            // $scope.loading = true;
+            $http.get("http://dmqlproject-env.eba-42wmrdba.us-east-2.elasticbeanstalk.com/data/allUsers?page="+page).success(onUserSuccess).error(onError);
             $scope.tableView = 1;
         }
 
-        $scope.getUsage = function () {
-            $http.get("http://localhost:8181/data/allUsage").success(onSuccess).error(onError);
+        $scope.getUsage = function (page) {
+            // $scope.loading = true;
+            $http.get("http://dmqlproject-env.eba-42wmrdba.us-east-2.elasticbeanstalk.com/data/allUsage?page="+page).success(onUsageSuccess).error(onError);
             $scope.tableView = 2;
         }
 
-        $scope.getPlans = function () {
-            $http.get("http://localhost:8181/data/allPlans").success(onSuccess).error(onError);
-            $scope.tableView = 3;
-            $scope.planChanged = 0;
-        }
-        $scope.planChange = function (data,originalValue,index){
-            // $scope.planChanged = 1;
-
-            if(index == 1 ){
-                if(originalValue!=data.cost)
-                data.changed = true;
-                else data.changed = false;
-            }
-
-        }
-
-        $scope.updatePlan = function (data){
-            $http.post("http://localhost:8181/data/createOrUpdatePlan",data).success(onSuccess).error(onError);
-            $scope.getPlans();
+        $scope.getPlans = function (page) {
+            // $scope.loading = true;
+            $http.get("http://dmqlproject-env.eba-42wmrdba.us-east-2.elasticbeanstalk.com/data/allPlans?page="+page).then(function (response){
+                console.log("Load GetPlans"+ response.data);
+                if(response.status == 200){
+                    console.log("GetPlan Success");
+                    $scope.plans = response.data;
+                    console.log("New Plans"+ $scope.plans);
+                }else{
+                    console.log("GetPlan Failure");
+                    toastr.options.timeOut = 2000; // 1.5s
+                    toastr.error(response.status ,response.error);
+                }
+            });
         }
 
-        $scope.getCoverage = function () {
-            $http.get("http://localhost:8181/data/allCoverage").success(onSuccess).error(onError);
+        $scope.getCoverage = function (page) {
+            // $scope.loading = true;
+            $http.get("http://dmqlproject-env.eba-42wmrdba.us-east-2.elasticbeanstalk.com/data/allCoverage?page="+page).success(onCoverageSuccess).error(onError);
             $scope.tableView = 4;
         }
-        $scope.getProviders = function () {
-            $scope.tableView = 5;
-            $http.get("http://localhost:8181/data/allServiceProviders").success(onSuccess).error(onError);
+        $scope.getProviders = function (page) {
+            $http.get("http://dmqlproject-env.eba-42wmrdba.us-east-2.elasticbeanstalk.com/data/allServiceProviders?page="+page).success(onProviderSuccess).error(onError);
+            $scope.providerEdit = false;
+        }
+
+
+        $scope.planChange = function (data, originalValue, each) {
+            // $scope.planChanged = 1;
+            // data.changed = true;
+            console.log("Entered data change");
+            console.log(data);
+            console.log(originalValue);
+            if (originalValue != data) {
+                each.changed = true;
+            }
+            else each.changed = false;
+
+            console.log(each.changed);
+            console.log($scope.providerInsert);
+
 
         }
 
-        $scope.clearScr = function (){
-            $scope.data = null;
-            $scope.tableView = 0;
+        $scope.updatePlan =  function (data) {
+            // $scope.loading = true;
+            $http.post("http://dmqlproject-env.eba-42wmrdba.us-east-2.elasticbeanstalk.com/data/createOrUpdatePlan", data).success(onSuccess).error(onError);
+            // $window.alert("Success!");
+            // $scope.loading = true;
+            // await sleep(1 * 1000);
+            // $scope.loading = false;
+            console.log("Before Update plan");
+            console.log($scope.plans);
+            $scope.getPlans($scope.planPage);
+            console.log("After Update plan");
+            console.log($scope.plans);
         }
+
+        $scope.updateCov =  function (data) {
+            $http.post("http://dmqlproject-env.eba-42wmrdba.us-east-2.elasticbeanstalk.com/data/createOrUpdateCoverage", data).success(onSuccess).error(onError);
+            $scope.getCoverage($scope.coveragePage);
+        }
+
+        $scope.updateUser =  function (data) {
+            $http.post("http://dmqlproject-env.eba-42wmrdba.us-east-2.elasticbeanstalk.com/data/createOrUpdateUser", data).success(onSuccess).error(onError);
+            // $window.alert("Success!");
+            // $scope.loading = true;
+            // await sleep(1 * 1000);
+            // $scope.loading = false;
+            $scope.getUsers($scope.userPage);
+        }
+
+        $scope.updateUsage =  function (data) {
+            $http.post("http://dmqlproject-env.eba-42wmrdba.us-east-2.elasticbeanstalk.com/data/createOrUpdateUsage", data).success(onSuccess).error(onError);
+            $scope.getUsage($scope.usagePage);
+        }
+
+        $scope.updateProvider = function (data) {
+            $http.post("http://dmqlproject-env.eba-42wmrdba.us-east-2.elasticbeanstalk.com/data/createOrUpdateProvider", data).success(onSuccess).error(onError);
+            $scope.getProviders($scope.providerPage);
+        }
+
+
+
+
+        //logics
+        $scope.switchToEditMode = function(table){
+            if(table==1){
+                $scope.providerEdit = !$scope.providerEdit;
+            }else if(table==2){
+                $scope.userEdit = !$scope.userEdit;
+            }else if(table==3){
+                $scope.coverageEdit = !$scope.coverageEdit;
+            }else if(table==4){
+                $scope.planEdit = !$scope.planEdit;
+            }else if(table==5){
+                $scope.usageEdit = !$scope.usageEdit;
+            }
+        }
+
+        $scope.insertData = function (table){
+            if(table==1){
+               //empty service provider list
+                $scope.providerBackUp = $scope.providers;
+                $scope.providers = [];
+                var providerPush = {id:'',headQuarters:'',providername:'',established:''};
+                providerPush.deleted = false;
+                $scope.providers.push(providerPush);
+                $scope.providerEdit = true;
+                $scope.providerInsert = true;
+
+            }else if(table==2){
+                $scope.userBackup = $scope.users;
+                $scope.users = [];
+                var userPush = {id:null,firstName:"",lastName:"",gender:"",street:"",city:"",state:"",zip:"",ssn:""};
+                userPush.deleted = false;
+                $scope.users.push(userPush);
+                $scope.userEdit = true;
+                $scope.userInsert = true;
+            }else if(table==3){
+                $scope.covBackup = $scope.coverage;
+                $scope.coverage = [];
+                var coveragePush = {id:null,serviceproviderid:"",signalStrength:"",zipcode:"",networktype:"",deleted:false};
+                coveragePush.deleted = false;
+                $scope.coverage.push(userPush);
+                $scope.coverageEdit = true;
+                $scope.covInsert = true;
+            }else if(table==4){
+                $scope.planBackup = $scope.plans;
+                $scope.plans = [];
+                var planPush = {id:null,cost:"",currency:"USD",serviceproviderid:"",talktimeinmins:"",dataingb:"",validityinmonths:"",networktype:"",deleted:false};
+                $scope.plans.push(planPush);
+                $scope.planEdit = true;
+                $scope.planInsert = true;
+            }else if(table==5){
+                $scope.usageBackup = $scope.usages;
+                $scope.usages = [];
+                var usagePush = {id:null,userId:"",planId:"",minutesused:"",dataUsed:"",serviceprovideraccountnumber:null,deleted:false};
+                $scope.usages.push(usagePush);
+                $scope.usageEdit = true;
+                $scope.usageInsert = true;
+            }
+        }
+
+        $scope.insertLogic = function (data,table){
+            data.id = null;
+            if(table==1) {
+                $scope.updateProvider(data);
+                $scope.providerInsert = false;
+                $scope.providerEdit = false;
+            }else if(table==2){
+                $scope.updateUser(data);
+                $scope.userInsert = false;
+                $scope.userEdit = false;
+            }else if(table==3){
+                $scope.updateCov(data);
+                $scope.covInsert = false;
+                $scope.coverageEdit = false;
+            }else if(table==4){
+                $scope.updatePlan(data);
+                $scope.planInsert = false;
+                $scope.planEdit = false;
+            }else if(table==5){
+                $scope.updateUsage(data);
+                $scope.usageInsert = false;
+                $scope.usageEdit = false;
+            }
+        }
+
+        $scope.cancelInsert = function (table){
+            if(table==1){
+                $scope.providers = $scope.providerBackUp;
+                $scope.providerInsert = false;
+                $scope.providerEdit = false;
+            }else if(table==2){
+                $scope.users = $scope.userBackUp;
+                $scope.userInsert = false;
+                $scope.userEdit = false;
+            }else if(table==3){
+                $scope.coverage = $scope.providerBackUp;
+                $scope.covInsert = false;
+                $scope.coverageEdit = false;
+            }else if(table==4){
+                $scope.plans = $scope.providerBackUp;
+                $scope.planInsert = false;
+                $scope.planEdit = false;
+            }else if(table==5){
+                $scope.usages = $scope.providerBackUp;
+                $scope.usageInsert = false;
+                $scope.usageEdit = false;
+            }
+        }
+
+        $scope.callPage = function (data, table) {
+
+            if (table == 1) {
+                $scope.providerPage = data;
+                $scope.getProviders($scope.providerPage);
+            } else if (table == 2) {
+                $scope.userPage = data;
+                $scope.getUsers($scope.userPage);
+            }else if (table == 3) {
+                $scope.coveragePage = data;
+                $scope.getCoverage($scope.coveragePage);
+            }else if (table == 4) {
+                $scope.planPage = data;
+                $scope.getPlans($scope.planPage);
+            }else if (table == 5) {
+                $scope.usagePage = data;
+                $scope.getUsage($scope.usagePage);
+            }
+        }
+
+
+        $scope.init =  async function () {
+
+            $scope.providerPage = 1;
+            $scope.userPage = 1;
+            $scope.usagePage = 1;
+            $scope.planPage = 1;
+            $scope.coveragePage = 1;
+
+
+            $scope.loading = true;
+            await sleep(3 * 1000);
+            $scope.loading = false;
+            $scope.providerEdit = false;
+            $scope.providerInsert = false;
+
+            $scope.userEdit = false;
+            $scope.userInsert = false;
+
+            $scope.coverageEdit = false;
+            $scope.covInsert = false;
+
+            $scope.planEdit = false;
+            $scope.planInsert = false;
+
+            $scope.usageEdit = false;
+            $scope.usageInsert = false;
+
+            $scope.getCoverage($scope.coveragePage);
+            $scope.getPlans($scope.planPage);
+            $scope.getUsage($scope.usagePage);
+            $scope.getUsers($scope.userPage);
+            $scope.getProviders($scope.providerPage);
+
+
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        $scope.init();
 
     });
 </script>
 </body>
+
+
+<style>
+body {
+padding : 10px ;
+
+}
+
+#exTab1 .tab-content {
+color : white;
+background-color: #428bca;
+padding : 5px 15px;
+}
+
+#exTab2 h3 {
+color : white;
+background-color: #428bca;
+padding : 5px 15px;
+}
+
+/* remove border radius for the tab */
+
+#exTab1 .nav-pills > li > a {
+border-radius: 0;
+}
+
+/* change border radius for the tab , apply corners on top*/
+
+#exTab3 .nav-pills > li > a {
+border-radius: 4px 4px 0 0 ;
+}
+
+#exTab3 .tab-content {
+color : white;
+/*background-color: #428bca;*/
+padding : 5px 15px;
+}
+
+</style>
+
 </html>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
